@@ -1,0 +1,69 @@
+Doctor:
+{
+    _id:"",
+    duuid:"",
+    profilePic:"",
+    firstName:"",
+    lastName:"",
+    contact:"",
+    dob:"",
+    gender:"",
+    nid:"",
+    religion:"",
+    bloodGroup:"",
+    education:[
+        {
+            degreeTitle:"",
+            graduationYear:"",
+            institution:""
+        }
+    ]
+    address:{
+
+        country:"",
+        city:"",
+        area:"",
+        district:"",
+        location:{
+            type:"",
+            coordinates:[],
+        }
+        
+    },
+
+    affiliations:[
+        {
+            organizationId:"",
+            organizationName:"",
+            address:{
+                country:"",
+                city:"",
+                area:"",
+                district:"",
+                location:{
+                type:"",
+                coordinates:[],
+                }
+
+            },
+            startDate:date,
+            endDate:date,
+
+            schedule:[
+            {
+              day:"",
+              starttime:"",
+              endtime:""
+            }
+            ],
+        }
+    ],
+    
+    trustVote:[puuid],
+    specialization:[String]
+
+}
+
+
+
+
