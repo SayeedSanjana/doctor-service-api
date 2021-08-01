@@ -5,11 +5,12 @@ const reqString = {
     trim: true,
     required: true,
     minlength: 3,
-    maxlength: 50,
+    maxlength: 255,
 };
 const opString = {
     type: String,
-    maxlength: 50,
+    maxlength: 255,
+    trim:true
 };
 const opMediumString = {
     type: String,
@@ -45,6 +46,7 @@ const duuidString = {
     trim: true,
     minlength: 9,
     maxlength: 9,
+    
 };
 
 //========================================================================================================================
@@ -65,7 +67,6 @@ const geoSchema = mongoose.Schema({
 const doctorSchema = mongoose.Schema({
 
     duuid: duuidString,
-    //profilePic:[opMediumString],
     firstName: reqString,
     lastName: opString,
     contact: reqContactString,
@@ -76,7 +77,6 @@ const doctorSchema = mongoose.Schema({
     nid: opNidString,
     nationality: reqString,
     address: {
-        // addressType:reqString, // present(0), permanant(1) or history(2)
         country: reqString,
         city: reqString,
         area: reqString,
@@ -118,19 +118,5 @@ const doctorSchema = mongoose.Schema({
     timestamps: true
 });
 
-// patientSchema.createIndexes({puuid:1,unique:true})
-
 export const Doctor = mongoose.model('Doctors', doctorSchema);
-//========================================================================================================================
-//address log independent schema for internal tracking of info
-// const addressLogSchema = mongoose.Schema({
-//     patientId:{type: mongoose.Types.ObjectId, ref: 'Patients'},
-//     addressType: reqString,
-//     country:reqString,
-//     city:reqString,
-//     area:reqString,
-//     zipcode:reqString,
-//     location:geoSchema,
-// });
-// export const AddressLog = mongoose.model('AddressLog', addressLogSchema);
-//========================================================================================================================
+
