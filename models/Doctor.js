@@ -104,7 +104,7 @@ const doctorSchema = mongoose.Schema({
         schedule: [{
             day: reqString,
             startTime: reqString,
-            endtime: reqString
+            endTime: reqString
         }],
         role:[String],
         startDate: reqDate,
