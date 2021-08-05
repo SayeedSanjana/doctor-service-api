@@ -1,5 +1,5 @@
 import express from 'express';
-import { doctorList,create, doctor ,doctorAffiliationList,update, addEducation, updateEducation, removeEducation, addAffiliations, addSchedule, addRole, updateAffiliation} from '../controllers/DoctorsController.js'
+import { doctorList,create, doctor ,doctorAffiliationList,update, addEducation, updateEducation, removeEducation, addAffiliations, addSchedule, addRole, updateAffiliation, updateSchedule} from '../controllers/DoctorsController.js'
 const router = express.Router();
 import upload from '../middleware/upload.js';
 
@@ -41,6 +41,9 @@ router.post('/:id/:affid/add-role', addRole);
 
 // PUT: /api/doctors/:id/:affid/update-doctor-affiliation
 router.put('/:id/:affid/update-doctor-affiliation', updateAffiliation);
+
+// PUT: /api/doctors/:id/:affid/:schid/update-doctor-schedule
+router.put('/:id/:affid/:schid/update-doctor-schedule', updateSchedule);
 
 
 

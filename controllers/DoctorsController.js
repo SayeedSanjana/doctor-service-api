@@ -3,41 +3,60 @@ import mongoose from "mongoose";
 import {convertToDotNotation,removeObjKeyValueNull,reshape} from "../helpers/reshape.js";
 import moment from "moment";
 //import upload from "../middleware/upload.js";
-
 //Get Doctor List
-export const doctorList = async (req, res,next) => {
+export const doctorList = async (req, res, next) => {
   try {
-    let docList='';
+    let docList = '';
     const resPerPage = 2; // results per page
-    const page = req.params.page ; // Page 
+    const page = req.params.page; // Page 
     //console.log(page);
-    
-    if (Object.keys(req.query).length>0){
-      const search=req.query.search;
-      if(mongoose.Types.ObjectId.isValid(search)){
-        docList=await Doctor.findById(search);
 
-      }else{
+    if (Object.keys(req.query).length > 0) {
+      const search = req.query.search;
+      if (mongoose.Types.ObjectId.isValid(search)) {
+        docList = await Doctor.findById(search);
+
+      } else {
         docList = await Doctor.find({
 
-          $or: [
-            
-            { duuid: { $regex:search, $options: '$i' } },
-            { firstName: { $regex:search, $options: '$i' } },
-            { lastName: { $regex:search, $options: '$i' } },
-            { contact: { $regex:search, $options: '$i' }},
-          ]
-          
-        }).skip((resPerPage * page) - resPerPage)
-        .limit(resPerPage);
+            $or: [
+
+              {
+                duuid: {
+                  $regex: search,
+                  $options: '$i'
+                }
+              },
+              {
+                firstName: {
+                  $regex: search,
+                  $options: '$i'
+                }
+              },
+              {
+                lastName: {
+                  $regex: search,
+                  $options: '$i'
+                }
+              },
+              {
+                contact: {
+                  $regex: search,
+                  $options: '$i'
+                }
+              },
+            ]
+
+          }).skip((resPerPage * page) - resPerPage)
+          .limit(resPerPage);
       }
-    }else{
+    } else {
 
       docList = await Doctor.find({})
-      .skip((resPerPage * page) - resPerPage)
-      .limit(resPerPage);
+        .skip((resPerPage * page) - resPerPage)
+        .limit(resPerPage);
     }
-  
+
 
     res.status(200).json({
       message: "Displaying Results",
@@ -51,13 +70,13 @@ export const doctorList = async (req, res,next) => {
     });
     next(err);
   }
-  
+
 };
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
 //Get Specific Doctor 
-export const doctor = async (req, res,next) => {
+export const doctor = async (req, res, next) => {
   let doctor = '';
   try {
     if (mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -67,21 +86,21 @@ export const doctor = async (req, res,next) => {
     } else {
 
       doctor = await Doctor.findOne({
-      duuid: req.params.id
+        duuid: req.params.id
       });
 
     }
 
     res.status(200).json({
-      message:"Displaying Result",
-      result:doctor
+      message: "Displaying Result",
+      result: doctor
     });
     next();
 
   } catch (err) {
     res.status(400).json({
       message: "Something went wrong",
-      error:err
+      error: err
     });
     next(err);
   }
@@ -90,28 +109,30 @@ export const doctor = async (req, res,next) => {
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 //Get Specific Doctor Affiliation Lists
-export const doctorAffiliationList = async (req, res,next) => {
+export const doctorAffiliationList = async (req, res, next) => {
   let doctor = '';
   try {
-    
-      
-        if(mongoose.Types.ObjectId.isValid(req.params.id)){
-          doctor=await Doctor.findById(req.params.id).select('affiliations');
-        }else{
-          doctor=await Doctor.findOne({duuid:req.params.id}).select('affiliations');
 
-        }
-          
+
+    if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+      doctor = await Doctor.findById(req.params.id).select('affiliations');
+    } else {
+      doctor = await Doctor.findOne({
+        duuid: req.params.id
+      }).select('affiliations');
+
+    }
+
     res.status(200).json({
-      message:"Displaying Result",
-      result:doctor
+      message: "Displaying Result",
+      result: doctor
     });
     next();
 
   } catch (err) {
     res.status(400).json({
       message: "Something went wrong",
-      error:err
+      error: err
     });
     next(err);
   }
@@ -121,11 +142,11 @@ export const doctorAffiliationList = async (req, res,next) => {
 
 //Create Doctor
 export const create = async (req, res, next) => {
-  
+
   try {
 
     const existDoctor = await Doctor.findOne({
-      duuid:req.body.duuid
+      duuid: req.body.duuid
     });
 
     if (existDoctor) {
@@ -178,17 +199,16 @@ export const update = async (req, res, next) => {
     const requestBody = existParams ? reshape(req.body, dropParams) : req.body;
     //console.log(requestBody);
 
-    let doctor= await Doctor.findByIdAndUpdate(
+    let doctor = await Doctor.findByIdAndUpdate(
       req.params.id,
-      requestBody, 
-      {
+      requestBody, {
         runValidators: true,
         new: true
       }
     );
     //console.log("---------",doctor)
 
-     doctor = reshape(doctor.toObject(), dropParams);
+    doctor = reshape(doctor.toObject(), dropParams);
 
     //console.log(doctor);
     res.status(201).json({
@@ -216,48 +236,45 @@ export const addEducation = async (req, res, next) => {
   try {
 
     let addEducation = req.body.education;
-    
 
-     let doctor = await Doctor.findById(req.params.id);
+
+    let doctor = await Doctor.findById(req.params.id);
 
     doctor = doctor.education;
     //console.log(doctor);
 
 
     if (doctor.length == 0) {
-      const doctorEducationQualification = await Doctor.findByIdAndUpdate(
-        {_id:req.params.id}, 
-        {
+      const doctorEducationQualification = await Doctor.findByIdAndUpdate({
+        _id: req.params.id
+      }, {
         $set: {
           education: addEducation
 
         }
-      },
-        {
-          new: true
-        }
-      );
+      }, {
+        new: true
+      });
       res.status(201).json({
         message: "Added",
         result: doctorEducationQualification.education
       });
 
-    }else {
+    } else {
 
       let result = addEducation.filter(v => !doctor.some(u => (u.degreeTitle.toLowerCase().replace(/[^a-zA-Z ]/g, "") === v.degreeTitle.toLowerCase().replace(/[^a-zA-Z ]/g, ""))));
       console.log(result)
       if (result.length > 0) {
 
-        const doctorDegree = await Doctor.findByIdAndUpdate(
-          {_id:req.params.id}, 
-          {
+        const doctorDegree = await Doctor.findByIdAndUpdate({
+          _id: req.params.id
+        }, {
 
           $push: {
             education: result
           }
-        },
-        {
-            new:true
+        }, {
+          new: true
         });
         res.status(201).json({
           message: "Education Added",
@@ -285,9 +302,9 @@ export const addEducation = async (req, res, next) => {
 
 //update existing education field of a doctor
 
- export const updateEducation = async (req, res, next) => {
+export const updateEducation = async (req, res, next) => {
 
-    try {
+  try {
 
     let updateEducation = req.body;
     //console.log(updateEducation);
@@ -303,7 +320,7 @@ export const addEducation = async (req, res, next) => {
     //check existence of the similar  degree in education
     doctorEducation.education.forEach(item => {
       if (item.degreeTitle.toLowerCase().replace(/[^a-zA-Z ]/g, "") === (req.body.degreeTitle).toLowerCase().replace(/[^a-zA-Z ]/g, "")) {
-          res.status(409).json({
+        res.status(409).json({
           message: "Degree Title already exist"
         });
         next();
@@ -322,7 +339,7 @@ export const addEducation = async (req, res, next) => {
     let prefix = "education." + idx + ".";
 
     let requestBody = convertToDotNotation(updateEducation, {}, prefix);
-     console.log(requestBody);
+    console.log(requestBody);
 
     //request body filter any key value null
     removeObjKeyValueNull(requestBody);
@@ -363,19 +380,18 @@ export const addEducation = async (req, res, next) => {
 export const removeEducation = async (req, res, next) => {
   try {
 
-     const doctor = await Doctor.findByIdAndUpdate(
-       { _id:mongoose.Types.ObjectId(req.params.id)},
-     {
-       $pull:{
-         education:{
-           _id:mongoose.Types.ObjectId(req.params.eid)
-         }
-       }
-      },
-      {
-        new:true,
-        safe:true
-     })
+    const doctor = await Doctor.findByIdAndUpdate({
+      _id: mongoose.Types.ObjectId(req.params.id)
+    }, {
+      $pull: {
+        education: {
+          _id: mongoose.Types.ObjectId(req.params.eid)
+        }
+      }
+    }, {
+      new: true,
+      safe: true
+    })
     res.status(200).json({
       message: "Education has been deleted",
       result: doctor.education
@@ -383,11 +399,11 @@ export const removeEducation = async (req, res, next) => {
     next();
 
   } catch (err) {
-      res.status(403).json({
-        message: "Education cannot be deleted",
-        error: err
-      });
-      next(err);
+    res.status(403).json({
+      message: "Education cannot be deleted",
+      error: err
+    });
+    next(err);
   }
 };
 
@@ -396,72 +412,69 @@ export const removeEducation = async (req, res, next) => {
 
 export const addAffiliations = async (req, res, next) => {
   try {
-    
+
     let addAffiliation = req.body.affiliations;
     //console.log(addAffiliation);
 
-    
-     let doctor = await Doctor.findById(req.params.id);
+
+    let doctor = await Doctor.findById(req.params.id);
 
     doctor = doctor.affiliations;
     console.log(doctor);
 
 
     if (doctor.length == 0) {
-       const doctorAffiliation = await Doctor.findByIdAndUpdate(
-        {_id:req.params.id}, 
-        {
+      const doctorAffiliation = await Doctor.findByIdAndUpdate({
+        _id: req.params.id
+      }, {
         $set: {
           affiliations: addAffiliation
 
         }
-      },
-        {
-          new: true
-        }
-      );
+      }, {
+        new: true
+      });
       res.status(201).json({
         message: "Added",
         result: doctorAffiliation.affiliations
       });
-    }else {
+    } else {
 
-            let result = addAffiliation.filter(v => !doctor.some(u => (u.organizationId.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, "") === v.organizationId.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, ""))));
-            console.log(result)
-            if (result.length > 0) {
-      
-               const doctorAffiliation = await Doctor.findByIdAndUpdate(
-                {_id:req.params.id}, 
-                {
-      
-                $push: {
-                  affiliations: result
-                }
-              },
-              {
-                  new:true
-              });
-              res.status(201).json({
-                message: "Affiliation Added",
-                result: doctorAffiliation.affiliations
-              });
-      
-            } else {
-              res.status(409).json({
-                message: "Affiliation already exist"
-              });
-            }
-      
+      let result = addAffiliation.filter(v => !doctor.some(u => (u.organizationId.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, "") === v.organizationId.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, ""))));
+      console.log(result)
+      if (result.length > 0) {
+
+        const doctorAffiliation = await Doctor.findByIdAndUpdate({
+          _id: req.params.id
+        }, {
+
+          $push: {
+            affiliations: result
           }
-      next();
-  }catch (err) {
-        res.status(400).json({
-          message: "Something went wrong!",
-          error: err
+        }, {
+          new: true
         });
-        next(err);
+        res.status(201).json({
+          message: "Affiliation Added",
+          result: doctorAffiliation.affiliations
+        });
+
+      } else {
+        res.status(409).json({
+          message: "Affiliation already exist"
+        });
       }
-    };
+
+    }
+    next();
+  } catch (err) {
+    res.status(400).json({
+      message: "Something went wrong!",
+      error: err
+    });
+    next(err);
+  }
+};
 
 // -----------------------------------------------------------------------------------------------------------------------
 
@@ -547,10 +560,10 @@ export const addSchedule = async (req, res, next) => {
 
 //add role of a doctor to specific affiliation
 
-export const addRole= async(req,res,next) =>{
+export const addRole = async (req, res, next) => {
   try {
     let addRole = req.body.role;
-  
+
 
     let doctorAffiliation = await Doctor.findOne({
       _id: mongoose.Types.ObjectId(req.params.id),
@@ -580,7 +593,7 @@ export const addRole= async(req,res,next) =>{
     // //console.log("Doctor Affilliation",doctorAffiliation);
 
 
-    let result = addRole.filter(v => !doctorAffiliation.some(u => (u.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, "") === v.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, "") )));
+    let result = addRole.filter(v => !doctorAffiliation.some(u => (u.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, "") === v.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, ""))));
     //console.log("-------",result);
 
     if (result.length > 0) {
@@ -628,53 +641,143 @@ export const updateAffiliation = async (req, res, next) => {
 
   try {
     // parameters that should be dropped when reaching this api
+    let updateAffiliations = req.body;
 
-    const dropParams = ['address', 'schedule', 'role'];
+    const dropParams = ['schedule', 'role', 'address'];
 
     // only call reshape if any of the drop params exist
     let existParams = Object.keys(req.body).some(item => dropParams.includes(item));
-    //console.log(existParams);
-    const updateAffiliation = existParams ? reshape(req.body, dropParams) : req.body;
+    console.log(existParams);
+    updateAffiliations = existParams ? reshape(req.body, dropParams) : req.body;
+    //console.log(requestBody);
+
+
+    // fetching affiliations of a doctor
+    let doctorAffiliation = await Doctor.findById(req.params.id).select({
+      'affiliations': 1,
+      '_id': 0
+    }).lean();
+
+    //console.log(doctorEducation);
+
+    //check existence of the similar  degree in education
+    doctorAffiliation.affiliations.forEach(item => {
+      if (item.organizationName.toLowerCase().replace(/[^a-zA-Z ]/g, "") === (req.body.organizationName).toLowerCase().replace(/[^a-zA-Z ]/g, "") ||
+        (item.organizationId === req.body.organizationId)) {
+        res.status(409).json({
+          message: "Affiliation already exist"
+        });
+        next();
+      }
+    });
+
+    //get index of the matched object passed in the parameter
+    let idx = 0;
+    doctorAffiliation.affiliations.forEach((item, index) => {
+
+      if (JSON.stringify(item._id) === JSON.stringify(req.params.affid)) return idx = index;
+
+    });
+    console.log(idx);
+
+    let prefix = "affiliations." + idx + ".";
+
+    let requestBody = convertToDotNotation(updateAffiliations, {}, prefix);
+    //console.log(requestBody);
+
+    //request body filter any key value null
+    removeObjKeyValueNull(requestBody);
+
+    //console.log(requestBody);
+    const doctor = await Doctor.findByIdAndUpdate(
+      req.params.id, {
+        $set: requestBody
+      }, {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    res.status(200).json({
+      message: "Affiliation updated",
+      result: doctor.affiliations
+    });
+
+    next();
+  } catch (err) {
+    res.status(400).json({
+      message: "Something went wrong!",
+      error: err
+    });
+    next(err);
+  }
+};
+
+
+//---------------------------------------------------------------------------------------------------------------
+
+//update existing schedule of a doctor
+
+export const updateSchedule= async(req,res,next) =>{
+
+  try {
+    // parameters that should be dropped when reaching this api
+    let updateSchedule=req.body;
+    //console.log(updateSchedule);
+  
     
-      // fetching affiliation of doctor
+      // fetching affiliations of a doctor
       let doctorAffiliation = await Doctor.findById(req.params.id).select({
         'affiliations': 1,
         '_id': 0
       }).lean();
   
       //console.log(doctorAffiliation.affiliations);
-  
-      //check existence of the similar  affiliation in education
-      doctorAffiliation.affiliations.forEach(item => {
-        if (item.organizationName.toLowerCase().replace(/[^a-zA-Z ]/g, "")  === (req.body.organizationName).toLowerCase().replace(/[^a-zA-Z ]/g, "") ||
-             item.organizationId===req.body.organizationId) {
-            res.status(409).json({
-            message: "Affiliation  already exist"
-          });
-          next();
-        }
-      });
-  
-      //get index of the matched object passed in the parameter
+
+      
+      //get index of the matched affiliation passed in the parameter
       let idx = 0;
       doctorAffiliation.affiliations.forEach((item, index) => {
   
         if (JSON.stringify(item._id) === JSON.stringify(req.params.affid)) return idx = index;
   
       });
-      //console.log(idx);
+      console.log(idx);
+
+      doctorAffiliation = doctorAffiliation.affiliations[idx].schedule;
+
+      console.log(doctorAffiliation);
   
-     let prefix = "affiliations." + idx + ".";
+    //   //check existence of the similar  schedule in the affiliation
+      doctorAffiliation.forEach(item => {
+        if (item.day.toLowerCase().replace(/[^a-zA-Z ]/g, "") === (req.body.day).toLowerCase().replace(/[^a-zA-Z ]/g, "")
+        && (item.startTime===req.body.startTime) && (item.endTime===req.body.endTime)) {
+            res.status(409).json({
+            message: "Schedule already exist"
+          });
+          next();
+        }
+      });
   
-      let requestBody = convertToDotNotation(updateAffiliation, {}, prefix);
-       console.log(requestBody);
+    //   //get index of the matched schedule passed in the parameter
+       let idxsc = 0;
+      doctorAffiliation.forEach((item, index) => {
+  
+        if (JSON.stringify(item._id) === JSON.stringify(req.params.schid)) return idx = index;
+  
+      });
+      console.log(idxsc);
+  
+      let prefix = "affiliations." + idx + "." + "schedule."+idxsc + ".";
+      console.log(prefix);
+  
+      let requestBody = convertToDotNotation(updateSchedule, {}, prefix);
+       //console.log(requestBody);
   
       //request body filter any key value null
       removeObjKeyValueNull(requestBody);
   
-      console.log(requestBody);
-  
-  
+    console.log(requestBody);
       const doctor = await Doctor.findByIdAndUpdate(
         req.params.id, {
           $set: requestBody
@@ -685,18 +788,17 @@ export const updateAffiliation = async (req, res, next) => {
       );
   
       res.status(200).json({
-        message: "Affiliation updated",
-        result: doctor.affiliations[idx]
+        message: "Schedule updated",
+        result: doctor.affiliations[idx].schedule
       });
   
       next();
-
-  } catch (err) {
+  }catch (err) {
     res.status(400).json({
-      message: "Something went wrong",
+      message: "Something went wrong!",
       error: err
     });
     next(err);
   }
-
-};
+  };
+  
