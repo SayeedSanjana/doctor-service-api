@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import {convertToDotNotation,removeObjKeyValueNull,reshape} from "../helpers/reshape.js";
 import moment from "moment";
 //import upload from "../middleware/upload.js";
+
+
 //Get Doctor List
 export const doctorList = async (req, res, next) => {
   try {
@@ -718,81 +720,192 @@ export const updateAffiliation = async (req, res, next) => {
 
 //update existing schedule of a doctor
 
-export const updateSchedule= async(req,res,next) =>{
+export const updateSchedule = async (req, res, next) => {
 
   try {
-    // parameters that should be dropped when reaching this api
-    let updateSchedule=req.body;
+
+    let updateSchedule = req.body;
     //console.log(updateSchedule);
-  
-    
-      // fetching affiliations of a doctor
-      let doctorAffiliation = await Doctor.findById(req.params.id).select({
-        'affiliations': 1,
-        '_id': 0
-      }).lean();
-  
-      //console.log(doctorAffiliation.affiliations);
 
-      
-      //get index of the matched affiliation passed in the parameter
-      let idx = 0;
-      doctorAffiliation.affiliations.forEach((item, index) => {
-  
-        if (JSON.stringify(item._id) === JSON.stringify(req.params.affid)) return idx = index;
-  
-      });
-      console.log(idx);
 
-      doctorAffiliation = doctorAffiliation.affiliations[idx].schedule;
+    // fetching affiliations of a doctor
+    let doctorAffiliation = await Doctor.findById(req.params.id).select({
+      'affiliations': 1,
+      '_id': 0
+    }).lean();
 
-      console.log(doctorAffiliation);
-  
+    //console.log(doctorAffiliation.affiliations);
+
+
+    //get index of the matched affiliation passed in the parameter
+    let idx = 0;
+    doctorAffiliation.affiliations.forEach((item, index) => {
+
+      if (JSON.stringify(item._id) === JSON.stringify(req.params.affid)) return idx = index;
+
+    });
+    console.log(idx);
+
+    doctorAffiliation = doctorAffiliation.affiliations[idx].schedule;
+
+    console.log(doctorAffiliation);
+
     //   //check existence of the similar  schedule in the affiliation
-      doctorAffiliation.forEach(item => {
-        if (item.day.toLowerCase().replace(/[^a-zA-Z ]/g, "") === (req.body.day).toLowerCase().replace(/[^a-zA-Z ]/g, "")
-        && (item.startTime===req.body.startTime) && (item.endTime===req.body.endTime)) {
-            res.status(409).json({
-            message: "Schedule already exist"
-          });
-          next();
-        }
-      });
-  
+    doctorAffiliation.forEach(item => {
+      if (item.day.toLowerCase().replace(/[^a-zA-Z ]/g, "") === (req.body.day).toLowerCase().replace(/[^a-zA-Z ]/g, "") &&
+        (item.startTime === req.body.startTime) && (item.endTime === req.body.endTime)) {
+        res.status(409).json({
+          message: "Schedule already exist"
+        });
+        next();
+      }
+    });
+
     //   //get index of the matched schedule passed in the parameter
-       let idxsc = 0;
-      doctorAffiliation.forEach((item, index) => {
-  
-        if (JSON.stringify(item._id) === JSON.stringify(req.params.schid)) return idx = index;
-  
-      });
-      console.log(idxsc);
-  
-      let prefix = "affiliations." + idx + "." + "schedule."+idxsc + ".";
-      console.log(prefix);
-  
-      let requestBody = convertToDotNotation(updateSchedule, {}, prefix);
-       //console.log(requestBody);
-  
-      //request body filter any key value null
-      removeObjKeyValueNull(requestBody);
-  
+    let idxsc = 0;
+    doctorAffiliation.forEach((item, index) => {
+
+      if (JSON.stringify(item._id) === JSON.stringify(req.params.schid)) return idx = index;
+
+    });
+    console.log(idxsc);
+
+    let prefix = "affiliations." + idx + "." + "schedule." + idxsc + ".";
+    console.log(prefix);
+
+    let requestBody = convertToDotNotation(updateSchedule, {}, prefix);
+    //console.log(requestBody);
+
+    //request body filter any key value null
+    removeObjKeyValueNull(requestBody);
+
     console.log(requestBody);
-      const doctor = await Doctor.findByIdAndUpdate(
-        req.params.id, {
-          $set: requestBody
-        }, {
-          new: true,
-          runValidators: true,
-        }
-      );
-  
-      res.status(200).json({
-        message: "Schedule updated",
-        result: doctor.affiliations[idx].schedule
-      });
-  
-      next();
+    const doctor = await Doctor.findByIdAndUpdate(
+      req.params.id, {
+        $set: requestBody
+      }, {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    res.status(200).json({
+      message: "Schedule updated",
+      result: doctor.affiliations[idx].schedule
+    });
+
+    next();
+  } catch (err) {
+    res.status(400).json({
+      message: "Something went wrong!",
+      error: err
+    });
+    next(err);
+  }
+};
+
+//-------------------------------------------------------------------------------------------------------------
+
+//update existing role of a doctor
+
+export const updateRole = async (req, res, next) => {
+
+  try {
+
+    let updateRole = req.body;
+    //console.log(updateRole);
+
+
+    // fetching affiliations of a doctor
+    let doctorAffiliation = await Doctor.findById(req.params.id).select({
+      'affiliations': 1,
+      '_id': 0
+    }).lean();
+
+    //get index of the matched affiliation passed in the parameter
+    let idx = 0;
+    doctorAffiliation.affiliations.forEach((item, index) => {
+
+      if (JSON.stringify(item._id) === JSON.stringify(req.params.affid)) return idx = index;
+
+    });
+
+    let doctor = doctorAffiliation.affiliations[idx].role;
+
+
+    //check existence of the similar  schedule in the affiliation
+    doctor.forEach(item => {
+      if (item.toLowerCase().replace(/[^a-zA-Z ]/g, "") === (req.body.role).toLowerCase().replace(/[^a-zA-Z ]/g, "")) {
+        res.status(409).json({
+          message: "Role already exist"
+        });
+        next();
+      }
+
+    });
+
+    let roleIndex = 0;
+    roleIndex = parseInt(req.params.roleid);
+
+    let prefix = "affiliations." + idx + ".";
+
+
+    let requestBody = convertToDotNotation(updateRole, {}, prefix);
+    //console.log(requestBody);
+
+    //request body filter any key value null
+    removeObjKeyValueNull(requestBody);
+
+
+    Object.keys(requestBody).forEach(item => {
+      return prefix = item
+    });
+    //console.log(prefix);
+
+    //Adding the index of role
+    let newprefix = "affiliations." + idx + "." + "role." + roleIndex;
+
+    delete Object.assign(requestBody, {
+      [newprefix]: requestBody[prefix]
+    })[prefix];
+    console.log(requestBody);
+
+
+    const doctorRole = await Doctor.findByIdAndUpdate(
+      req.params.id, {
+        $set: requestBody
+      }, {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    res.status(200).json({
+      message: "Role updated",
+      result: doctorRole.affiliations[idx].role
+    });
+
+    next();
+  } catch (err) {
+    res.status(400).json({
+      message: "Something went wrong!",
+      error: err
+    });
+    next(err);
+  }
+};
+
+
+
+//-----------------------------------------------------------------------------------------------------------------------------
+
+//update existing affiliation address
+
+
+export const updateAffiliationAddress = async (req, res, next) => {
+
+  try {
+    next();
   }catch (err) {
     res.status(400).json({
       message: "Something went wrong!",
@@ -800,5 +913,4 @@ export const updateSchedule= async(req,res,next) =>{
     });
     next(err);
   }
-  };
-  
+};
