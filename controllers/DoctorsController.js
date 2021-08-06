@@ -4,7 +4,6 @@ import {convertToDotNotation,removeObjKeyValueNull,reshape} from "../helpers/res
 import moment from "moment";
 //import upload from "../middleware/upload.js";
 
-
 //Get Doctor List
 export const doctorList = async (req, res, next) => {
   try {
@@ -905,8 +904,55 @@ export const updateRole = async (req, res, next) => {
 export const updateAffiliationAddress = async (req, res, next) => {
 
   try {
+    let updateAddress = req.body;
+    //console.log(updateAddress);
+
+
+    // fetching affiliations of a doctor
+    let doctorAffiliation = await Doctor.findById(req.params.id).select({
+      'affiliations': 1,
+      '_id': 0
+    }).lean();
+
+    //get index of the matched affiliation passed in the parameter
+    let idx = 0;
+    doctorAffiliation.affiliations.forEach((item, index) => {
+
+      if (JSON.stringify(item._id) === JSON.stringify(req.params.affid)) return idx = index;
+
+    });
+
+
+    let prefix = "affiliations." + idx + ".";
+
+
+    let requestBody = convertToDotNotation(updateAddress, {}, prefix);
+    //console.log(requestBody);
+
+    //request body filter any key value null
+    removeObjKeyValueNull(requestBody);
+
+    console.log(requestBody);
+
+
+    const address = await Doctor.findByIdAndUpdate(
+      req.params.id, {
+        $set: requestBody
+      }, {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    res.status(200).json({
+      message: "Role updated",
+      result: address.affiliations[idx].address
+    });
+
+
+
     next();
-  }catch (err) {
+  } catch (err) {
     res.status(400).json({
       message: "Something went wrong!",
       error: err
