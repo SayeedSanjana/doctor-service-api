@@ -1,20 +1,23 @@
 import express from 'express';
-import { doctorList,create, doctor ,doctorAffiliationList,update, addEducation, updateEducation, removeEducation, addAffiliations, addSchedule, addRole, updateAffiliation, updateSchedule, updateRole, updateAffiliationAddress, removeSchedule, removeAffiliationAddress, removeRole, removeAffiliation, updateAddress, removeAddress, updateProfileImage} from '../controllers/DoctorsController.js'
+import { doctorList,create, doctor ,doctorAffiliationList,update, addEducation, updateEducation, removeEducation, addAffiliations, addSchedule, addRole, updateAffiliation, updateSchedule, updateRole, updateAffiliationAddress, removeSchedule, removeAffiliationAddress, removeRole, removeAffiliation, updateAddress, removeAddress, updateProfileImage, doctorAffiliation} from '../controllers/DoctorsController.js'
 const router = express.Router();
 import upload from '../middleware/upload.js';
 
 
 // GET: /api/doctors
-router.get('/:page', doctorList);
+router.get('/', doctorList);
 
 // POST: /api/doctors/create
 router.post('/create', create );
 
 // GET: /api/doctors/:id
-router.get('/:id/specific-doctor', doctor);
+router.get('/:id', doctor);
 
 // GET: /api/doctors/:id
 router.get('/:id/doctor-affiliationList', doctorAffiliationList);
+
+// GET: /api/doctors/:id/:affid
+router.get('/:id/:affid/doctor-specific-affiliation', doctorAffiliation);
 
 // PUT: /api/doctors/:id/update
 router.put('/:id/update', update);

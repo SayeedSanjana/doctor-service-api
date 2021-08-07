@@ -5,20 +5,22 @@ import moment from "moment";
 //import upload from "../middleware/upload.js";
 
 
-//Get Doctor List
 export const doctorList = async (req, res, next) => {
   try {
     let docList = '';
     const resPerPage = 2; // results per page
-    const page = req.params.page; // Page 
-    //console.log(page);
+    //const page = req.params.page; // Page 
+   
+    const page=req.query.page;
+    const search=req.query.search;
+     
 
-    if (Object.keys(req.query).length > 0) {
-      const search = req.query.search;
+    if ((Object.keys(req.query)).includes('search')) {
       if (mongoose.Types.ObjectId.isValid(search)) {
         docList = await Doctor.findById(search);
 
       } else {
+    
         docList = await Doctor.find({
 
             $or: [
@@ -75,9 +77,9 @@ export const doctorList = async (req, res, next) => {
 
 };
 
-//-----------------------------------------------------------------------------------------------------------------------------
+ //-----------------------------------------------------------------------------------------------------------------------------
 
-//Get Specific Doctor 
+ //Get Specific Doctor 
 export const doctor = async (req, res, next) => {
   let doctor = '';
   try {
@@ -128,6 +130,60 @@ export const doctorAffiliationList = async (req, res, next) => {
     res.status(200).json({
       message: "Displaying Result",
       result: doctor
+    });
+    next();
+
+  } catch (err) {
+    res.status(400).json({
+      message: "Something went wrong",
+      error: err
+    });
+    next(err);
+  }
+};
+
+//-------------------------------------------------------------------------------------------------------------------------------------------
+
+
+//Get Specific Doctor Specific Affiliation 
+
+export const doctorAffiliation = async (req, res, next) => {
+  let doctor = '';
+  let idx=0;
+  try {
+
+
+    if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+      doctor = await Doctor.findOne(
+        
+        {_id:req.params.id,
+        "affiliations._id":mongoose.Types.ObjectId(req.params.affid)
+        }
+        
+      );
+      doctor.affiliations.forEach((item,index)=>{
+        if(item._id===mongoose.Types.ObjectId(req.params.affid)){
+          return index=idx;
+        }
+      });//.select('affiliations');
+    } else {
+      doctor = await Doctor.findOne(
+        {
+        duuid: req.params.id,
+        "affiliations._id":mongoose.Types.ObjectId(req.params.affid)
+        }
+        );//.select('affiliations');
+        doctor.affiliations.forEach((item,index)=>{
+          if(item._id===mongoose.Types.ObjectId(req.params.affid)){
+            return index=idx;
+          }
+        });
+
+    }
+
+    res.status(200).json({
+      message: "Displaying Result",
+      result: doctor.affiliations[idx].role
     });
     next();
 
