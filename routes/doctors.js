@@ -1,5 +1,5 @@
 import express from 'express';
-import { doctorList,create, doctor ,doctorAffiliationList,update, addEducation, updateEducation, removeEducation, addAffiliations, addSchedule, addRole, updateAffiliation, updateSchedule, updateRole, updateAffiliationAddress, removeSchedule, removeAffiliationAddress, removeRole, removeAffiliation, updateAddress, removeAddress} from '../controllers/DoctorsController.js'
+import { doctorList,create, doctor ,doctorAffiliationList,update, addEducation, updateEducation, removeEducation, addAffiliations, addSchedule, addRole, updateAffiliation, updateSchedule, updateRole, updateAffiliationAddress, removeSchedule, removeAffiliationAddress, removeRole, removeAffiliation, updateAddress, removeAddress, updateProfileImage} from '../controllers/DoctorsController.js'
 const router = express.Router();
 import upload from '../middleware/upload.js';
 
@@ -66,6 +66,9 @@ router.delete('/:id/:affid/remove-role', removeRole);
 
 // DELETE: /api/doctors/:id/:affid/remove-affiliation
 router.delete('/:id/:affid/remove-affiliation', removeAffiliation);
+
+// PUT: /api/doctors/:id/update-profile-image
+router.put('/:id/update-profile-image', upload.single("images"),updateProfileImage);
 
 
 

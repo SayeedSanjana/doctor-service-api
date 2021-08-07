@@ -1224,3 +1224,48 @@ export const removeAffiliation = async (req, res, next) => {
     next(err);
   }
 };
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------
+
+//update or add profile picture of doctor
+
+
+export const updateProfileImage = async (req, res, next) => {
+
+  try {
+    //console.log(req.file.path);
+
+    const doctorprofilepic = await Doctor.findOneAndUpdate(
+
+      {
+        _id: req.params.id
+      }, {
+        $push: {
+          "images": req.file.path
+        }
+      }, {
+        new: true
+      }
+
+    );
+
+    let image = doctorprofilepic.images;
+    image = image[image.length - 1];
+    console.log(image);
+
+    res.status(200).json({
+      message: "Profile Picture Uploaded",
+      result: image
+    });
+
+
+    next();
+
+  } catch (err) {
+    res.status(400).json({
+      message: "Something went wrong",
+      error: err
+    });
+    next(err);
+  }
+};
