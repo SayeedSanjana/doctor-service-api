@@ -4,6 +4,7 @@ import {convertToDotNotation,removeObjKeyValueNull,reshape} from "../helpers/res
 import moment from "moment";
 //import upload from "../middleware/upload.js";
 
+
 //Get Doctor List
 export const doctorList = async (req, res, next) => {
   try {
@@ -151,7 +152,7 @@ export const create = async (req, res, next) => {
     });
 
     if (existDoctor) {
-      res.status(403).json("Doctor General Info Already Exist");
+      res.status(406).json("Doctor General Info Already Exist");
 
     } else {
       //if there exists image file
@@ -230,6 +231,154 @@ export const update = async (req, res, next) => {
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 
+//update existing address of the doctor
+
+export const updateAddress = async (req, res, next) => {
+
+  try {
+    let requestBody = convertToDotNotation(req.body);
+
+    // request body filter any key value null
+    removeObjKeyValueNull(requestBody);
+    const doctor = await Doctor.findByIdAndUpdate(
+      req.params.id, {
+        $set: requestBody
+      }, {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    res.status(200).json({
+      message: "Doctor Address Updated",
+      result: doctor.address
+    });
+    next();
+
+  } catch (err) {
+    res.status(400).json({
+      message: "Something went wrong",
+      error: err
+    });
+    next(err);
+  }
+};
+
+//----------------------------------------------------------------------------------------------------------------------------------------------
+
+//remove address of doctor
+
+export const removeAddress = async (req, res, next) => {
+
+  try {
+
+    const doctor = await Doctor.findByIdAndUpdate(
+      req.params.id, {
+        $unset: {
+          address: ""
+        }
+      },
+    );
+
+    const addressKeyExist = Object.keys(doctor.toObject());
+
+    // ternary operator used
+    !addressKeyExist.includes('address') ?
+      res.status(406).json({
+        message: "Error! Address does not exist",
+        result: doctor.address
+      }) :
+      res.status(200).json({
+        message: "Address Removed",
+        result: doctor.address
+      });
+    next();
+
+
+  } catch (err) {
+    res.status(400).json({
+      message: 'Error Occured!! During Removing Address',
+      error: err
+    });
+    next(err);
+  }
+};
+
+//--------------------------------------------------------------------------------------------------------------------
+
+//update existing education field of a doctor
+
+export const updateEducation = async (req, res, next) => {
+
+  try {
+
+    let updateEducation = req.body;
+    //console.log(updateEducation);
+
+    // fetching education of doctor
+    let doctorEducation = await Doctor.findById(req.params.id).select({
+      'education': 1,
+      '_id': 0
+    }).lean();
+
+    //console.log(doctorEducation);
+
+    //check existence of the similar  degree in education
+    doctorEducation.education.forEach(item => {
+      if (item.degreeTitle.toLowerCase().replace(/[^a-zA-Z ]/g, "") === (req.body.degreeTitle).toLowerCase().replace(/[^a-zA-Z ]/g, "")) {
+        res.status(406).json({
+          message: "Degree Title already exist"
+        });
+        next();
+      }
+    });
+
+    //get index of the matched object passed in the parameter
+    let idx = 0;
+    doctorEducation.education.forEach((item, index) => {
+
+      if (JSON.stringify(item._id) === JSON.stringify(req.params.eid)) return idx = index;
+
+    });
+    //console.log(idx);
+
+    let prefix = "education." + idx + ".";
+
+    let requestBody = convertToDotNotation(updateEducation, {}, prefix);
+    console.log(requestBody);
+
+    //request body filter any key value null
+    removeObjKeyValueNull(requestBody);
+
+    console.log(requestBody);
+
+
+    const doctor = await Doctor.findByIdAndUpdate(
+      req.params.id, {
+        $set: requestBody
+      }, {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    res.status(200).json({
+      message: "Education updated",
+      result: doctor.education
+    });
+
+    next();
+
+
+  } catch (err) {
+    res.status(400).json({
+      message: "Something went wrong!",
+      error: err
+    });
+    next(err);
+  }
+};
+
 //add education of doctors
 
 export const addEducation = async (req, res, next) => {
@@ -283,88 +432,13 @@ export const addEducation = async (req, res, next) => {
         });
 
       } else {
-        res.status(409).json({
+        res.status(406).json({
           message: "Information regarding this degree already exist"
         });
       }
 
     }
     next();
-  } catch (err) {
-    res.status(400).json({
-      message: "Something went wrong!",
-      error: err
-    });
-    next(err);
-  }
-};
-
-//--------------------------------------------------------------------------------------------------------------------
-
-//update existing education field of a doctor
-
-export const updateEducation = async (req, res, next) => {
-
-  try {
-
-    let updateEducation = req.body;
-    //console.log(updateEducation);
-
-    // fetching education of doctor
-    let doctorEducation = await Doctor.findById(req.params.id).select({
-      'education': 1,
-      '_id': 0
-    }).lean();
-
-    //console.log(doctorEducation);
-
-    //check existence of the similar  degree in education
-    doctorEducation.education.forEach(item => {
-      if (item.degreeTitle.toLowerCase().replace(/[^a-zA-Z ]/g, "") === (req.body.degreeTitle).toLowerCase().replace(/[^a-zA-Z ]/g, "")) {
-        res.status(409).json({
-          message: "Degree Title already exist"
-        });
-        next();
-      }
-    });
-
-    //get index of the matched object passed in the parameter
-    let idx = 0;
-    doctorEducation.education.forEach((item, index) => {
-
-      if (JSON.stringify(item._id) === JSON.stringify(req.params.eid)) return idx = index;
-
-    });
-    //console.log(idx);
-
-    let prefix = "education." + idx + ".";
-
-    let requestBody = convertToDotNotation(updateEducation, {}, prefix);
-    console.log(requestBody);
-
-    //request body filter any key value null
-    removeObjKeyValueNull(requestBody);
-
-    console.log(requestBody);
-
-
-    const doctor = await Doctor.findByIdAndUpdate(
-      req.params.id, {
-        $set: requestBody
-      }, {
-        new: true,
-        runValidators: true,
-      }
-    );
-
-    res.status(200).json({
-      message: "Education updated",
-      result: doctor.education
-    });
-
-    next();
-
-
   } catch (err) {
     res.status(400).json({
       message: "Something went wrong!",
@@ -400,7 +474,7 @@ export const removeEducation = async (req, res, next) => {
     next();
 
   } catch (err) {
-    res.status(403).json({
+    res.status(400).json({
       message: "Education cannot be deleted",
       error: err
     });
@@ -461,7 +535,7 @@ export const addAffiliations = async (req, res, next) => {
         });
 
       } else {
-        res.status(409).json({
+        res.status(406).json({
           message: "Affiliation already exist"
         });
       }
@@ -589,11 +663,6 @@ export const addRole = async (req, res, next) => {
 
     doctorAffiliation = doctorAffiliation.affiliations[idx].role;
 
-    // //deleting _id from each object stored in achedule array so that it matches with the req.body
-    // doctorAffiliation.forEach(a => delete a._id);
-    // //console.log("Doctor Affilliation",doctorAffiliation);
-
-
     let result = addRole.filter(v => !doctorAffiliation.some(u => (u.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, "") === v.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, ""))));
     //console.log("-------",result);
 
@@ -665,7 +734,7 @@ export const updateAffiliation = async (req, res, next) => {
     doctorAffiliation.affiliations.forEach(item => {
       if (item.organizationName.toLowerCase().replace(/[^a-zA-Z ]/g, "") === (req.body.organizationName).toLowerCase().replace(/[^a-zA-Z ]/g, "") ||
         (item.organizationId === req.body.organizationId)) {
-        res.status(409).json({
+        res.status(406).json({
           message: "Affiliation already exist"
         });
         next();
@@ -753,7 +822,7 @@ export const updateSchedule = async (req, res, next) => {
     doctorAffiliation.forEach(item => {
       if (item.day.toLowerCase().replace(/[^a-zA-Z ]/g, "") === (req.body.day).toLowerCase().replace(/[^a-zA-Z ]/g, "") &&
         (item.startTime === req.body.startTime) && (item.endTime === req.body.endTime)) {
-        res.status(409).json({
+        res.status(406).json({
           message: "Schedule already exist"
         });
         next();
@@ -835,7 +904,7 @@ export const updateRole = async (req, res, next) => {
     //check existence of the similar  schedule in the affiliation
     doctor.forEach(item => {
       if (item.toLowerCase().replace(/[^a-zA-Z ]/g, "") === (req.body.role).toLowerCase().replace(/[^a-zA-Z ]/g, "")) {
-        res.status(409).json({
+        res.status(406).json({
           message: "Role already exist"
         });
         next();
@@ -955,6 +1024,201 @@ export const updateAffiliationAddress = async (req, res, next) => {
   } catch (err) {
     res.status(400).json({
       message: "Something went wrong!",
+      error: err
+    });
+    next(err);
+  }
+};
+
+//----------------------------------------------------------------------------------------------------------------
+
+//remove schedule of a doctor
+
+
+export const removeSchedule = async (req, res, next) => {
+  try {
+
+
+    // fetching affiliations of a doctor
+    let doctorAffiliation = await Doctor.findById(req.params.id).select({
+      'affiliations': 1,
+      '_id': 0
+    }).lean();
+
+
+    //get index of the matched affiliation passed in the parameter
+    let idx = 0;
+    doctorAffiliation.affiliations.forEach((item, index) => {
+
+      if (JSON.stringify(item._id) === JSON.stringify(req.params.affid)) return idx = index;
+
+    });
+
+
+    const doctor = await Doctor.findOneAndUpdate({
+      _id: mongoose.Types.ObjectId(req.params.id),
+      "affiliations._id": mongoose.Types.ObjectId(req.params.affid),
+    }, {
+      $pull: {
+        "affiliations.$.schedule": {
+          _id: req.params.schid
+        }
+      }
+    }, {
+      new: true
+    });
+    res.status(200).json({
+      message: "Schedule deleted!",
+      result: doctor.affiliations[idx].schedule
+    });
+    next();
+  } catch (err) {
+    res.status(400).json({
+      message: "Something went wrong",
+      error: err
+    });
+    next(err);
+  }
+};
+
+//------------------------------------------------------------------------------------------------------------
+
+//remove affiliation-address of the doctor
+
+
+
+export const removeAffiliationAddress = async (req, res, next) => {
+  try {
+
+
+    // fetching affiliations of a doctor
+    let doctorAffiliation = await Doctor.findById(req.params.id).select({
+      'affiliations': 1,
+      '_id': 0
+    }).lean();
+
+
+    //get index of the matched affiliation passed in the parameter
+    let idx = 0;
+    doctorAffiliation.affiliations.forEach((item, index) => {
+
+      if (JSON.stringify(item._id) === JSON.stringify(req.params.affid)) return idx = index;
+
+    });
+
+    const doctor = await Doctor.findOneAndUpdate({
+      _id: mongoose.Types.ObjectId(req.params.id),
+      "affiliations._id": mongoose.Types.ObjectId(req.params.affid),
+    }, {
+      $unset: {
+        "affiliations.$.address": ""
+      }
+    }, {
+      new: true
+    });
+
+    const addressKeyExist = Object.keys(doctorAffiliation.affiliations[idx]);
+
+
+    // ternary operator used
+    !addressKeyExist.includes('address') ?
+      res.status(406).json({
+        message: "Error! Address does not exist",
+        result: doctor.affiliations[idx].address
+      }) :
+      res.status(201).json({
+        message: "Address Removed",
+        result: doctor.affiliations[idx].address
+      });
+    next();
+  } catch (err) {
+    res.status(400).json({
+      message: "Something went wrong",
+      error: err
+    });
+    next(err);
+  }
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------------------
+
+
+
+export const removeRole = async (req, res, next) => {
+  try {
+
+
+    // fetching affiliations of a doctor
+    let doctorAffiliation = await Doctor.findById(req.params.id).select({
+      'affiliations': 1,
+      '_id': 0
+    }).lean();
+
+
+    //get index of the matched affiliation passed in the parameter
+    let idx = 0;
+    doctorAffiliation.affiliations.forEach((item, index) => {
+
+      if (JSON.stringify(item._id) === JSON.stringify(req.params.affid)) return idx = index;
+
+    });
+
+
+    const doctor = await Doctor.findOneAndUpdate({
+      _id: mongoose.Types.ObjectId(req.params.id),
+      "affiliations._id": mongoose.Types.ObjectId(req.params.affid),
+    }, {
+      $pull: {
+        "affiliations.$.role": req.body.role
+      }
+    }, {
+      new: true
+    });
+    res.status(200).json({
+      message: "Role deleted!",
+      result: doctor.affiliations[idx].role
+    });
+    next();
+  } catch (err) {
+    res.status(400).json({
+      message: "Something went wrong",
+      error: err
+    });
+    next(err);
+  }
+};
+
+
+//--------------------------------------------------------------------------------------------------------------------
+
+//remove affiliation of doctor
+
+
+
+export const removeAffiliation = async (req, res, next) => {
+  try {
+
+    const doctor = await Doctor.findOneAndUpdate({
+      _id: mongoose.Types.ObjectId(req.params.id),
+      // "affiliations._id": mongoose.Types.ObjectId(req.params.affid),
+    }, {
+      $pull: {
+        affiliations: {
+          _id: mongoose.Types.ObjectId(req.params.affid)
+        }
+      }
+    }, {
+      new: true
+    });
+    res.status(200).json({
+      message: "Affiliation deleted!",
+      result: doctor.affiliations
+    });
+    next();
+  } catch (err) {
+    res.status(400).json({
+      message: "Something went wrong",
       error: err
     });
     next(err);

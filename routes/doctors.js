@@ -1,5 +1,5 @@
 import express from 'express';
-import { doctorList,create, doctor ,doctorAffiliationList,update, addEducation, updateEducation, removeEducation, addAffiliations, addSchedule, addRole, updateAffiliation, updateSchedule, updateRole, updateAffiliationAddress} from '../controllers/DoctorsController.js'
+import { doctorList,create, doctor ,doctorAffiliationList,update, addEducation, updateEducation, removeEducation, addAffiliations, addSchedule, addRole, updateAffiliation, updateSchedule, updateRole, updateAffiliationAddress, removeSchedule, removeAffiliationAddress, removeRole, removeAffiliation, updateAddress, removeAddress} from '../controllers/DoctorsController.js'
 const router = express.Router();
 import upload from '../middleware/upload.js';
 
@@ -18,6 +18,12 @@ router.get('/:id/doctor-affiliationList', doctorAffiliationList);
 
 // PUT: /api/doctors/:id/update
 router.put('/:id/update', update);
+
+// PUT: /api/doctors/:id/update-address
+router.put('/:id/update-address', updateAddress);
+
+// DELETE: /api/doctors/:id/remove-address
+router.delete('/:id/remove-address', removeAddress);
 
 // POST: /api/doctors/:id/add-doctor-education
 router.post('/:id/add-doctor-education', addEducation);
@@ -49,10 +55,17 @@ router.put('/:id/:affid/:roleid/update-doctor-role', updateRole);
 // PUT: /api/doctors/:id/:affid/:roleid/update-doctor-affiliation-address
 router.put('/:id/:affid/update-doctor-affiliation-address', updateAffiliationAddress);
 
+// DELETE: /api/doctors/:id/:affid/:schid/remove-schedule
+router.delete('/:id/:affid/:schid/remove-schedule', removeSchedule);
 
+// DELETE: /api/doctors/:id/:affid/remove-affiliation-address
+router.delete('/:id/:affid/remove-affiliation-address', removeAffiliationAddress);
 
+// DELETE: /api/doctors/:id/:affid/remove-role
+router.delete('/:id/:affid/remove-role', removeRole);
 
-
+// DELETE: /api/doctors/:id/:affid/remove-affiliation
+router.delete('/:id/:affid/remove-affiliation', removeAffiliation);
 
 
 
