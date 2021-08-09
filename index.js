@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 import {} from 'dotenv/config';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-//import { errorlogger, logger } from './middleware/logger/logger.js';
+import { errorlogger, logger } from './middleware/logger/logger.js';
 import { SwaggerOptions } from './swaggerOptions.js';
 
 
@@ -19,7 +19,7 @@ const swaggerDocs = swaggerJSDoc(SwaggerOptions);
 app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // registering logger
-//app.use(logger);
+app.use(logger);
 
 // route middleware
 app.use('/api/doctors',doctorRoutes);
@@ -50,7 +50,7 @@ app.get('/:id?', (req, res,next)=>{
     });
 
 });
-//app.use(errorlogger);
+app.use(errorlogger);
 
 mongoose.connect(process.env.CONNECTION_STRING.replace('<DBPORT>', process.env.DBPORT),
 {
