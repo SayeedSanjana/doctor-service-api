@@ -1,7 +1,7 @@
 import {Doctor} from "../models/Doctor.js";
 import mongoose from "mongoose";
 import {convertToDotNotation,removeObjKeyValueNull,reshape} from "../helpers/reshape.js";
-import moment from "moment";
+//import moment from "moment";
 //import upload from "../middleware/upload.js";
 
 
@@ -183,7 +183,7 @@ export const doctorAffiliation = async (req, res, next) => {
 
     res.status(200).json({
       message: "Displaying Result",
-      result: doctor.affiliations[idx].role
+      result: doctor.affiliations[idx]
     });
     next();
 
@@ -1070,7 +1070,7 @@ export const updateAffiliationAddress = async (req, res, next) => {
     );
 
     res.status(200).json({
-      message: "Role updated",
+      message: "Address updated",
       result: address.affiliations[idx].address
     });
 

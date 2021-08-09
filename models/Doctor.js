@@ -86,7 +86,7 @@ const doctorSchema = mongoose.Schema({
     images: [String],
     education: [{
         degreeTitle: reqString,
-        graduationYear: reqString,
+        graduationYear: reqDate,
         institution: reqString
     }],
     affiliations: [{

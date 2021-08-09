@@ -2,13 +2,15 @@ import express from 'express';
 import { doctorList,create, doctor ,doctorAffiliationList,update, addEducation, updateEducation, removeEducation, addAffiliations, addSchedule, addRole, updateAffiliation, updateSchedule, updateRole, updateAffiliationAddress, removeSchedule, removeAffiliationAddress, removeRole, removeAffiliation, updateAddress, removeAddress, updateProfileImage, doctorAffiliation} from '../controllers/DoctorsController.js'
 const router = express.Router();
 import upload from '../middleware/upload.js';
+import {validateRequestSchema} from '../middleware/validate-request-schema.js';
+import {doctorSchemaValidator,doctorEducationValidator,doctorAffiliationValidator,doctorScheduleValidator} from '../middleware/doctor-schema.js';
 
 
 // GET: /api/doctors
 router.get('/', doctorList);
 
 // POST: /api/doctors/create
-router.post('/create', create );
+router.post('/create', doctorSchemaValidator,validateRequestSchema, create );
 
 // GET: /api/doctors/:id
 router.get('/:id', doctor);
@@ -29,7 +31,7 @@ router.put('/:id/update-address', updateAddress);
 router.delete('/:id/remove-address', removeAddress);
 
 // POST: /api/doctors/:id/add-doctor-education
-router.post('/:id/add-doctor-education', addEducation);
+router.post('/:id/add-doctor-education',doctorEducationValidator,validateRequestSchema, addEducation);
 
 // PUT: /api/doctors/:id/:eid/update-doctor-education
 router.put('/:id/:eid/update-doctor-education', updateEducation);
@@ -38,10 +40,10 @@ router.put('/:id/:eid/update-doctor-education', updateEducation);
 router.delete('/:id/:eid/remove-doctor-education', removeEducation);
 
 // POST: /api/doctors/:id/add-doctor-affiliation
-router.post('/:id/add-doctor-affiliation', addAffiliations);
+router.post('/:id/add-doctor-affiliation',doctorAffiliationValidator,validateRequestSchema, addAffiliations);
 
 // POST: /api/doctors/:id/:affid/add-schedule
-router.post('/:id/:affid/add-schedule', addSchedule);
+router.post('/:id/:affid/add-schedule',doctorScheduleValidator,validateRequestSchema,addSchedule);
 
 // POST: /api/doctors/:id/:affid/add-role
 router.post('/:id/:affid/add-role', addRole);

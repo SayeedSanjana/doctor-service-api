@@ -10,6 +10,7 @@
  6. npm i --save swagger-jsdoc swagger-ui-express // installing swagger to enable documentation.
  7. npm i winston // logger for debugging API.
  8. npm i winston-mongodb
+ 9. npm install --save express-validator //for server side data validation
 
  ### set up environment
 
