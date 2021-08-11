@@ -801,14 +801,378 @@ router.put('/:id/:eid/update-doctor-education', updateEducation);
 // DELETE: /api/doctors/:id/:eid/remove-doctor-education
 router.delete('/:id/:eid/remove-doctor-education', removeEducation);
 
+
+
+/**
+ * @swagger
+ * /api/doctors/{id}/add-doctor-affiliation:
+ *   post:
+ *     summary: add affiliation of doctor.
+ *     tags:
+ *       - Doctor's Affiliation
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: alpha numeric ID of the user to retrieve.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:                           
+ *                 affiliations:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       organizationId:
+ *                         type: string
+ *                         example: 123123123
+ *                       organizationName:
+ *                         type: string
+ *                         example: DMC
+ *                       startDate:
+ *                         type: date
+ *                         example: 2019-09-08  
+ *                       endDate:
+ *                         type: date
+ *                         example: 2021-09-08        
+ *                       address:
+ *                         type: object
+ *                         properties:
+ *                           country:
+ *                             type: string
+ *                             example: Bangladesh           
+ *                           city:
+ *                             type: string
+ *                             example: Dhaka          
+ *                           area:
+ *                             type: string
+ *                             example: shahbag          
+ *                           zipcode:
+ *                             type: string
+ *                             example: 1207          
+ *                           location:
+ *                             type: object
+ *                             properties:
+ *                               type:
+ *                                 type: string
+ *                                 example: point
+ *                               coordinates:
+ *                                 type: array
+ *                                 example: [91.1112, 84.3223]        
+ *                       schedule:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:   
+ *                             day:
+ *                               type: string
+ *                               example: Wednesday          
+ *                             startTime:
+ *                               type: string
+ *                               example: 12:30          
+ *                             endTime:
+ *                               type: string
+ *                               example: 14:30          
+ *     responses:
+ *       201:
+ *         description: Affiliation Added
+ *         content:
+ *           application/json:
+ *             schema:
+ *                  type: object
+ *                  properties:
+ *                    message:
+ *                      type: string
+ *                      example: Affiliation Added
+ *                    result:
+ *                      type: object
+ *                      properties:
+ *                        affiliations:
+ *                          type: array
+ *                          items:
+ *                            type: object
+ *                            properties:
+ *                              _id:
+ *                                type: string
+ *                                example: 1
+ *                              organizationId:
+ *                                type: string
+ *                                example: 123123123
+ *                              organizationName:
+ *                                type: string
+ *                                example: DMC
+ *                              startDate:
+ *                                type: date
+ *                                example: 2019-09-08
+ *                              endDate:
+ *                                type: date
+ *                                example: 2019-09-08
+ *                              address:
+ *                                type: object
+ *                                properties:
+ *                                  country:
+ *                                    type: string
+ *                                    example: Bangladesh
+ *                                  city:
+ *                                    type: string
+ *                                    example: Dhaka
+ *                                  area:
+ *                                    type: string
+ *                                    example: Shahbag
+ *                                  zipcode:
+ *                                    type: string
+ *                                    example: 1207
+ *                                  location:
+ *                                    type: object
+ *                                    properties:
+ *                                      type:
+ *                                        type: string
+ *                                        example: point
+ *                                      coordinates:
+ *                                        type: array
+ *                                        example: [91.1112, 84.3223]
+ *                              schedule:
+ *                                type: array
+ *                                items:
+ *                                  type: object
+ *                                  properties:
+ *                                    day:
+ *                                      type: string
+ *                                      example: Wednesday
+ *                                    startTime:
+ *                                      type: string
+ *                                      example: 12:30
+ *                                    endTime:
+ *                                      type: string
+ *                                      example: 14:30
+ *       406: 
+ *         description: Affiliation already exist
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Affiliation already exist
+ *       400:
+ *         desctiption: Something went wrong (Bad Request)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Something went wrong
+ *                 error:
+ *                   type: object
+ *                   example: {}           
+ */
+
+
 // POST: /api/doctors/:id/add-doctor-affiliation
 router.post('/:id/add-doctor-affiliation',doctorAffiliationValidator,validateRequestSchema, addAffiliations);
+
+
+
+/**
+ * @swagger
+ * /api/doctors/{id}/{affid}/add-schedule:
+ *   post:
+ *     summary: add schedule of doctor.
+ *     tags:
+ *       - Doctor's Affiliation
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: alpha numeric ID of the user to retrieve.
+ *       - in: path
+ *         name: affid
+ *         required: true
+ *         description: alpha numeric ID of the user to retrieve.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:                           
+ *                 schedule:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       day:
+ *                         type: string
+ *                         example: Thursday
+ *                       startTime:
+ *                         type: string
+ *                         example: 14:00
+ *                       endTime:
+ *                         type: string
+ *                         example: 15:00         
+ *     responses:
+ *       201:
+ *         description: Schedule Added
+ *         content:
+ *           application/json:
+ *             schema:
+ *                  type: object
+ *                  properties:
+ *                    message:
+ *                      type: string
+ *                      example: Schedule Added
+ *                    result:
+ *                      type: object
+ *                      properties:
+ *                        schedule:
+ *                          type: array
+ *                          items:
+ *                            type: object
+ *                            properties:
+ *                              _id:
+ *                                type: string
+ *                                example: 1
+ *                              day:
+ *                                type: string
+ *                                example: Thursday
+ *                              startTime:
+ *                                type: string
+ *                                example: 14:00
+ *                              endTime:
+ *                                type: string
+ *                                example: 16:00
+ *       406:
+ *         description: Schedule already exist
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Schedule already exist
+ *       400:
+ *         desctiption: Something went wrong (Bad Request)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Something went wrong
+ *                 error:
+ *                   type: object
+ *                   example: {}           
+ */
 
 // POST: /api/doctors/:id/:affid/add-schedule
 router.post('/:id/:affid/add-schedule',doctorScheduleValidator,validateRequestSchema,addSchedule);
 
 // POST: /api/doctors/:id/:affid/add-role
 router.post('/:id/:affid/add-role', addRole);
+
+
+/**
+ * @swagger
+ * /api/doctors/{id}/{affid}/update-doctor-affiliation:
+ *   put:
+ *     summary: update affiliation of doctor.
+ *     tags:
+ *       - Doctor's Affiliation
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: alpha numeric ID of the user to retrieve.
+ *       - in: path
+ *         name: affid
+ *         required: true
+ *         description: alpha numeric ID of the user to retrieve.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               organizationId:
+ *                 type: string
+ *                 example: 123123123
+ *               organizationName:
+ *                 type: string
+ *                 example: DMC
+ *               startDate:
+ *                 type: date
+ *                 example: 2019-09-08       
+ *               endDate:
+ *                 type: date
+ *                 example: 2021-09-08       
+ *     responses:
+ *       200:
+ *         description: Affiliation updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *                  type: object
+ *                  properties:
+ *                    message:
+ *                      type: string
+ *                      example: Affiliation updated
+ *                    result:
+ *                      type: object
+ *                      properties:
+ *                        affiliations:
+ *                          type: array
+ *                          items:
+ *                            type: object
+ *                            properties:
+ *                              _id:
+ *                                type: string
+ *                                example: 1
+ *                              organizationId:
+ *                                type: string
+ *                                example: 123123123
+ *                              organizationName:
+ *                                type: string
+ *                                example: DMC
+ *                              startDate:
+ *                                type: date
+ *                                example: 2019-09-08
+ *                              endDate:
+ *                                type: date
+ *                                example: 2021-09-08
+ *       406:
+ *         description: Affiliation already exist
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Affiliaition already exist
+ *       400:
+ *         desctiption: Something went wrong (Bad Request)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Something went wrong
+ *                 error:
+ *                   type: object
+ *                   example: {}           
+ */
 
 // PUT: /api/doctors/:id/:affid/update-doctor-affiliation
 router.put('/:id/:affid/update-doctor-affiliation', updateAffiliation);
@@ -830,6 +1194,112 @@ router.delete('/:id/:affid/remove-affiliation-address', removeAffiliationAddress
 
 // DELETE: /api/doctors/:id/:affid/remove-role
 router.delete('/:id/:affid/remove-role', removeRole);
+
+
+/**
+ * @swagger
+ * /api/doctors/{id}/{affid}/remove-affiliation:
+ *   delete:
+ *     summary: remove affiliation.
+ *     description: remove affiliation - only one can be removed at a time 
+ *     tags:
+ *       - Doctor's Affiliation
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: alpha numeric ID of the user to retrieve.
+ *       - in: path
+ *         name: affid
+ *         required: true
+ *         description: alpha numeric ID of the user to retrieve.
+ *     responses:
+ *       200:
+ *         description: Affiliation Deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *                  type: object
+ *                  properties:
+ *                    message:
+ *                      type: string
+ *                      example: Affiliation Deleted
+ *                    result:
+ *                      type: object
+ *                      properties:
+ *                        affiliations:
+ *                          type: array
+ *                          items:
+ *                            type: object
+ *                            properties:
+ *                              _id:
+ *                                type: string
+ *                                example: 1
+ *                              organizationId:
+ *                                type: string
+ *                                example: 123123123
+ *                              organizationName:
+ *                                type: string
+ *                                example: DMC
+ *                              startDate:
+ *                                type: date
+ *                                example: 2019-09-08
+ *                              endDate:
+ *                                type: date
+ *                                example: 2019-09-08
+ *                              address:
+ *                                type: object
+ *                                properties:
+ *                                  country:
+ *                                    type: string
+ *                                    example: Bangladesh
+ *                                  city:
+ *                                    type: string
+ *                                    example: Dhaka
+ *                                  area:
+ *                                    type: string
+ *                                    example: Shahbag
+ *                                  zipcode:
+ *                                    type: string
+ *                                    example: 1207
+ *                                  location:
+ *                                    type: object
+ *                                    properties:
+ *                                      type:
+ *                                        type: string
+ *                                        example: point
+ *                                      coordinates:
+ *                                        type: array
+ *                                        example: [91.1112, 84.3223]
+ *                              schedule:
+ *                                type: array
+ *                                items:
+ *                                  type: object
+ *                                  properties:
+ *                                    day:
+ *                                      type: string
+ *                                      example: Wednesday
+ *                                    startTime:
+ *                                      type: string
+ *                                      example: 12:30
+ *                                    endTime:
+ *                                      type: string
+ *                                      example: 14:30
+ *       400:
+ *         desctiption: Something went wrong (Bad Request)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Something went wrong
+ *                 error:
+ *                   type: object
+ *                   example: {}           
+ */
+
 
 // DELETE: /api/doctors/:id/:affid/remove-affiliation
 router.delete('/:id/:affid/remove-affiliation', removeAffiliation);

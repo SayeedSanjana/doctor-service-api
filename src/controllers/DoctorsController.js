@@ -664,7 +664,7 @@ export const addSchedule = async (req, res, next) => {
 
       res.status(201).json({
         message: "Schedule Added",
-        result: doctor.affiliation
+        result: doctor.affiliations[idx].schedule
       });
 
 
@@ -736,7 +736,7 @@ export const addRole = async (req, res, next) => {
 
       res.status(201).json({
         message: "Role Added",
-        result: doctor.role
+        result: doctor.affiliations[idx].role
       });
 
 
