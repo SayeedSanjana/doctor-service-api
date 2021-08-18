@@ -8,7 +8,7 @@ import {convertToDotNotation,removeObjKeyValueNull,reshape} from "../helpers/res
 export const doctorList = async (req, res, next) => {
   try {
     let docList = '';
-    const resPerPage = 2; // results per page
+     const resPerPage = 2; // results per page
     //const page = req.params.page; // Page 
    
     const page=req.query.page;
@@ -111,7 +111,58 @@ export const doctor = async (req, res, next) => {
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//Get Specific Doctor Specific Education
 
+export const doctorEducation = async (req, res, next) => {
+  let doctor = '';
+  let idx=0;
+  try {
+
+
+    if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+      doctor = await Doctor.findOne(
+        
+        {_id:req.params.id,
+        "education._id":mongoose.Types.ObjectId(req.params.eid)
+        }
+        
+      );
+      doctor.education.forEach((item,index)=>{
+        if(item._id===mongoose.Types.ObjectId(req.params.eid)){
+          return index=idx;
+        }
+      });
+    } else {
+      doctor = await Doctor.findOne(
+        {
+        duuid: req.params.id,
+        "education._id":mongoose.Types.ObjectId(req.params.eid)
+        }
+        );
+        doctor.education.forEach((item,index)=>{
+          if(item._id===mongoose.Types.ObjectId(req.params.eid)){
+            return index=idx;
+          }
+        });
+
+    }
+
+    res.status(200).json({
+      message: "Displaying Result",
+      result: doctor.education[idx]
+    });
+    next();
+
+  } catch (err) {
+    res.status(400).json({
+      message: "Something went wrong",
+      error: err
+    });
+    next(err);
+  }
+};
+
+//----------------------------------------------------------------------------------------------------------------------------------------
 //Get Specific Doctor Affiliation Lists
 export const doctorAffiliationList = async (req, res, next) => {
   let doctor = '';

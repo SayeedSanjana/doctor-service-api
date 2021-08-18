@@ -1,5 +1,5 @@
 import express from 'express';
-import { doctorList,create, doctor ,doctorAffiliationList,update, addEducation, updateEducation, removeEducation, addAffiliations, addSchedule, addRole, updateAffiliation, updateSchedule, updateRole, updateAffiliationAddress, removeSchedule, removeAffiliationAddress, removeRole, removeAffiliation, updateAddress, removeAddress, updateProfileImage, doctorAffiliation} from '../controllers/DoctorsController.js'
+import { doctorList,create, doctor ,doctorAffiliationList,update, addEducation, updateEducation, removeEducation, addAffiliations, addSchedule, addRole, updateAffiliation, updateSchedule, updateRole, updateAffiliationAddress, removeSchedule, removeAffiliationAddress, removeRole, removeAffiliation, updateAddress, removeAddress, updateProfileImage, doctorAffiliation, doctorEducation} from '../controllers/DoctorsController.js'
 const router = express.Router();
 import upload from '../middleware/upload.js';
 import {validateRequestSchema} from '../middleware/validate-request-schema.js';
@@ -298,6 +298,10 @@ router.get('/:id/doctor-affiliationList', doctorAffiliationList);
 
 // GET: /api/doctors/:id/:affid
 router.get('/:id/:affid/doctor-specific-affiliation', doctorAffiliation);
+
+
+// GET: /api/doctors/:id/:eid
+router.get('/:id/:eid/doctor-specific-education', doctorEducation);
 
 
 /**

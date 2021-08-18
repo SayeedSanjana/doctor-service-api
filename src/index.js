@@ -7,12 +7,19 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { errorlogger, logger } from './middleware/logger/logger.js';
 import { SwaggerOptions } from './swaggerOptions.js';
+import cors from 'cors';
 
 
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cors());
+
+const corsOptions={
+    origin:'http://localhost:9000/',
+    optionsSuccessStatus:200
+}
 
 // mounting swagger from here
 const swaggerDocs = swaggerJSDoc(SwaggerOptions);
@@ -22,7 +29,7 @@ app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use(logger);
 
 // route middleware
-app.use('/api/doctors',doctorRoutes);
+app.use('/api/doctors',cors(),doctorRoutes);
 //app.use('/api/prescription-images', prescriptionImageRoutes);
 
 
